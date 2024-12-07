@@ -3,14 +3,17 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { authenticate } from "../actions/auth";
+import { EyeOff } from "lucide-react";
+import { Eye } from "lucide-react";
 
 export default function SignUpPage() {
   const [errorMessage, formAction, isPending] = useActionState(
     authenticate,
     undefined,
   );
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
@@ -23,7 +26,7 @@ export default function SignUpPage() {
             <input type="hidden" name="redirectTo" value="/dashboard" />
 
             {errorMessage && (
-              <div className="text-error-foreground bg-error/5 mb text-balance rounded p-1 text-center text-sm">
+              <div className="mb text-balance rounded bg-error/5 p-1 text-center text-sm text-error-foreground">
                 <p>{errorMessage}</p>
               </div>
             )}
@@ -31,7 +34,7 @@ export default function SignUpPage() {
             <div className="relative mb-4 h-fit">
               <label
                 htmlFor="email"
-                className="text-secondary-foreground/70 absolute left-2 top-1 text-xs font-medium"
+                className="absolute left-2 top-1 text-xs font-medium text-secondary-foreground/70"
               >
                 Email
               </label>
@@ -47,19 +50,30 @@ export default function SignUpPage() {
             <div className="relative mb-4 h-fit">
               <label
                 htmlFor="email"
-                className="text-secondary-foreground/70 absolute left-2 top-1 text-xs font-medium"
+                className="absolute left-2 top-1 z-10 text-xs font-medium text-secondary-foreground/70"
               >
                 Password
               </label>
               <Input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 id="password"
                 name="password"
                 required
                 minLength={8}
-                className="mt-1 w-full rounded-md border px-3 pb-4 pt-7"
+                className="z-0 mt-1 w-full rounded-md border px-3 pb-4 pt-7"
                 placeholder="Enter your password"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
             </div>
             <Button disabled={isPending} className="w-full">
               {isPending ? "Logging in.." : "Login"}
