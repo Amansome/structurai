@@ -4,11 +4,11 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useActionState } from "react";
-import { register } from "../actions/auth";
+import { authenticate } from "../actions/auth";
 
 export default function SignUpPage() {
   const [errorMessage, formAction, isPending] = useActionState(
-    register,
+    authenticate,
     undefined,
   );
 
@@ -16,16 +16,15 @@ export default function SignUpPage() {
     <div className="flex min-h-screen flex-col items-center justify-center">
       <div className="w-full max-w-sm space-y-6">
         <Card className="p-6">
-          <h1 className="mb-4 text-2xl font-bold">Create an account</h1>
+          <h1 className="mb-4 text-2xl font-bold">Signin to account</h1>
 
           {/* Add your sign-up form fields here */}
           <form action={formAction}>
+            <input type="hidden" name="redirectTo" value="/dashboard" />
 
-          {errorMessage && (
-              <div className="text-error-foreground bg-error/5 text-sm rounded p-1 text-balance text-center mb">
-                <p>
-                {errorMessage}
-                </p>
+            {errorMessage && (
+              <div className="text-error-foreground bg-error/5 mb text-balance rounded p-1 text-center text-sm">
+                <p>{errorMessage}</p>
               </div>
             )}
 
@@ -63,12 +62,13 @@ export default function SignUpPage() {
               />
             </div>
             <Button disabled={isPending} className="w-full">
-              {isPending ? "Creacting account..." : "Create account"}</Button>
+              {isPending ? "Logging in.." : "Login"}
+            </Button>
 
             <p className="mt-4">
-              Already have an account?{" "}
+              Have an account?{" "}
               <Button asChild size={"sm"} variant={"secondary"}>
-                <Link href="/signin">Sign in</Link>
+                <Link href="/signup">Create account</Link>
               </Button>
             </p>
           </form>
