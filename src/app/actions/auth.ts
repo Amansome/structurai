@@ -70,12 +70,23 @@ export async function register(
   formData: FormData,
 ) {
   const otp = formData.get("otp") as string;
-  
+
   try {
     const { email, password } = await signUpSchema.parseAsync({
       email: formData.get("email"),
       password: formData.get("password"),
     });
+
+    // Check if the user already exists
+    const existingUser = await db.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    if (existingUser) {
+      return "User already exists";
+    }
 
     const otpRecord = await db.otp.findFirst({
       where: {
@@ -91,16 +102,6 @@ export async function register(
       return "Invalid or expired OTP.";
     }
 
-    const user = await db.user.findUnique({
-      where: {
-        email: email,
-      },
-    });
-
-    if (user) {
-      return "User already exists";
-    }
-
     const hash = await bcrypt.hash(password, 10);
 
     await db.user.create({
@@ -113,7 +114,10 @@ export async function register(
     await db.otp.delete({
       where: { id: otpRecord.id },
     });
-    
+
+    // Log the user in after successful registration
+    await signIn("credentials", { email, password });
+
   } catch (error) {
     if (error instanceof ZodError) {
       return error.errors.map((error) => error.message).join(", ");

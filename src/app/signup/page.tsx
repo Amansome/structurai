@@ -124,18 +124,6 @@ export default function SignUpPage() {
                   Enter the verification code sent to {email}
                 </p>
                 <div className="flex justify-center">
-                  {/* <InputOTP
-                    value={otp}
-                    onChange={setOtp}
-                    maxLength={6}
-                    render={({ slots }) => (
-                      <InputOTPGroup>
-                        {slots.map((slot, index) => (
-                          <InputOTPSlot key={index} {...slot} index={index} />
-                        ))}
-                      </InputOTPGroup>
-                    )}
-                  /> */}
                   <InputOTP
                     maxLength={6}
                     pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
@@ -151,7 +139,6 @@ export default function SignUpPage() {
                       <InputOTPSlot index={5} />
                     </InputOTPGroup>
                   </InputOTP>
-                  
                 </div>
               </div>
             )}
