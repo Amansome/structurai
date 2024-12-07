@@ -5,10 +5,9 @@ export default auth((req) => {
 
   if (!isAuthenticated) {
     const newUrl = new URL("/signin", req.nextUrl.origin);
-    return Response.redirect(newUrl);
+    return Response.redirect(newUrl.toString(), 302); 
   }
 });
-
 
 export const config = {
     matcher: ["/dashboard/:path*"],
