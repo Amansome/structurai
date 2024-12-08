@@ -6,7 +6,6 @@ import { ZodError } from "zod";
 import bcrypt from "bcryptjs";
 import { signIn, signOut } from "@/server/auth";
 import { AuthError } from "next-auth";
-import nodemailer from "nodemailer";
 import { addMinutes } from "date-fns";
 
 export async function SignOut() {
@@ -33,21 +32,17 @@ export async function authenticate(
 }
 
 async function sendOtp(email: string, otp: string) {
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_SERVER_HOST,
-    port: parseInt(process.env.EMAIL_SERVER_PORT || "587"),
-    auth: {
-      user: process.env.EMAIL_SERVER_USER,
-      pass: process.env.EMAIL_SERVER_PASSWORD,
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/email`, { 
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
     },
+    body: JSON.stringify({ email, otp }),
   });
 
-  await transporter.sendMail({
-    from: '"Your App" <cs@mzed.studio>',
-    to: email,
-    subject: "Your OTP Code",
-    text: `Your OTP code is ${otp}. It is valid for 5 minutes.`,
-  });
+  if (!response.ok) {
+    throw new Error('Failed to send OTP email');
+  }
 }
 
 export async function generateAndSendOtp(email: string) {
