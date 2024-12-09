@@ -1,7 +1,7 @@
 import { auth } from "./server/auth";
 
 
-const AUTH_ROUTES = ['/signin', '/signup'];
+const AUTH_ROUTES = ['/signin', '/signup', '/password/reset'];
 const DEFAULT_REDIRECT = '/dashboard';
 
 export default auth((req) => {
@@ -40,6 +40,7 @@ export const config = {
   matcher: [
     '/dashboard/:path*',
     '/signin',
-    '/signup'
+    '/signup',
+    '/password/reset'
   ]
 };

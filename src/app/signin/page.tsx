@@ -18,8 +18,9 @@ export default function SignUpPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
       <div className="w-full max-w-sm space-y-6">
-        <Card className="p-6">
-          <h1 className="mb-4 text-2xl font-bold">Signin to account</h1>
+        <Card className="p-6 ">
+          <h1 className=" text-2xl font-bold mb-6">Signin to account</h1>
+
 
           {/* Add your sign-up form fields here */}
           <form action={formAction}>
@@ -74,8 +75,16 @@ export default function SignUpPage() {
                   <Eye className="h-4 w-4" />
                 )}
               </button>
-            </div>
-            <Button disabled={isPending} className="w-full">
+
+            <div className="flex mb-6 absolute right-0 
+           justify-between items-center">
+              <Button asChild size={"sm"} variant={'link'} >
+                <Link href="/password/reset">Forgot password?</Link>
+              </Button>
+          </div>
+             </div>
+
+            <Button disabled={isPending} className="w-full mt-6">
               {isPending ? "Logging in.." : "Login"}
             </Button>
 
