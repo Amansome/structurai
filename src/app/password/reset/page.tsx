@@ -4,53 +4,61 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Loader2 } from "lucide-react";
 
 export default function PasswordReset() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [message, setMessage] = useState('');
   const [step, setStep] = useState(1); // 1: email, 2: OTP, 3: new password
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Update the handleSubmit function in your PasswordReset component
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  
-  // Create request body based on current step
-  const requestBody = {
-    step,
-    email,
-    ...(step >= 2 && { otp }),
-    ...(step === 3 && { newPassword })
-  };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    // Create request body based on current step
+    const requestBody = {
+      step,
+      email,
+      ...(step >= 2 && { otp }),
+      ...(step === 3 && { newPassword })
+    };
 
-  console.log("Request Body:", requestBody);
+    try {
+      const response = await fetch('/api/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody),
+      });
 
-  try {
-    const response = await fetch('/api/password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestBody),
-    });
-
-    if (response.ok) {
-      if (step === 1) {
-        setMessage("Check your email for the OTP.");
-        setStep(2);
-      } else if (step === 2) {
-        setStep(3);
-        setMessage("");
+      if (response.ok) {
+        if (step === 1) {
+          setMessage("Check your email for the OTP.");
+          setStep(2);
+        } else if (step === 2) {
+          setStep(3);
+          setMessage("");
+        } else {
+          setMessage("Password reset successfully. Redirecting to sign in...");
+          // Add a slight delay before redirect to show the success message
+          setTimeout(() => {
+            router.push('/signin');
+          }, 1500);
+        }
       } else {
-        setMessage("Password reset successfully.");
+        const errorData = await response.json();
+        setMessage(errorData.error || "An error occurred.");
       }
-    } else {
-      const errorData = await response.json();
-      setMessage(errorData.error || "An error occurred.");
+    } catch (error) {
+      setMessage("An error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-  } catch (error) {
-    setMessage("An error occurred. Please try again.");
-  }
-};
+  };
 
   const getButtonText = () => {
     switch (step) {
@@ -108,7 +116,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               placeholder="Enter your email"
               required
               className="mt-1 w-full rounded-md border px-3"
-              disabled={step !== 1}
+              disabled={step !== 1 || isLoading}
             />
             
             {step >= 2 && (
@@ -119,6 +127,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                 placeholder="Enter OTP"
                 required
                 className="mt-4 w-full rounded-md border px-3"
+                disabled={isLoading}
               />
             )}
             
@@ -130,11 +139,23 @@ const handleSubmit = async (e: React.FormEvent) => {
                 placeholder="Enter new password"
                 required
                 className="mt-4 w-full rounded-md border px-3"
+                disabled={isLoading}
               />
             )}
 
-            <Button type="submit" className="w-full mt-6">
-              {getButtonText()}
+            <Button 
+              type="submit" 
+              className="w-full mt-6"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Please wait...
+                </>
+              ) : (
+                getButtonText()
+              )}
             </Button>
 
             {message && (
@@ -147,7 +168,12 @@ const handleSubmit = async (e: React.FormEvent) => {
           </form>
 
           <div className="flex justify-between items-center mt-4">
-            <Button asChild size="sm" variant="link">
+            <Button 
+              asChild 
+              size="sm" 
+              variant="link"
+              disabled={isLoading}
+            >
               <Link href="/signin">Already have an account? Sign in</Link>
             </Button>
           </div>
