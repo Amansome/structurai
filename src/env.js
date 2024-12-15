@@ -21,6 +21,9 @@ export const env = createEnv({
       EMAIL_SERVER_USER: z.string(),
       EMAIL_SERVER_HOST: z.string(),
       EMAIL_SERVER_PORT: z.string(),
+      AUTH_GOOGLE_ID: z.string(),
+      AUTH_GOOGLE_SECRET: z.string(),
+
   },
 
   /**
@@ -48,6 +51,8 @@ export const env = createEnv({
     EMAIL_SERVER_HOST: process.env.EMAIL_SERVER_HOST,
     EMAIL_SERVER_PORT: process.env.EMAIL_SERVER_PORT,
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+    AUTH_GOOGLE_ID: process.env.AUTH_GOOGLE_ID,
+    AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

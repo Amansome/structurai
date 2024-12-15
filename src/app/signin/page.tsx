@@ -7,6 +7,7 @@ import { useActionState, useState } from "react";
 import { authenticate } from "../actions/auth";
 import { EyeOff } from "lucide-react";
 import { Eye } from "lucide-react";
+import { SignInWithGoogle } from "@/components/auth/SignInWithGoogle";
 
 export default function SignUpPage() {
   const [errorMessage, formAction, isPending] = useActionState(
@@ -20,7 +21,8 @@ export default function SignUpPage() {
       <div className="w-full max-w-sm space-y-6">
         <Card className="p-6 ">
           <h1 className=" text-2xl font-bold mb-6">Signin to account</h1>
-
+          
+        <SignInWithGoogle />
 
           {/* Add your sign-up form fields here */}
           <form action={formAction}>

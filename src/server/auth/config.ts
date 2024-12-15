@@ -35,7 +35,7 @@ declare module "next-auth" {
  * @see https://next-auth.js.org/configuration/options
  */
 export const authConfig = {
-  providers: [
+  providers: [Google,
     Credentials({
       name: "Credentials",
       credentials: {
