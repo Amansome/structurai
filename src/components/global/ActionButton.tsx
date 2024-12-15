@@ -5,9 +5,11 @@ import { Button } from "../ui/button";
 import { Loader2, LucideIcon } from "lucide-react";
 import { ButtonProps } from "@/components/ui/button";
 import { useState } from "react";
+import Image from "next/image";
 
 interface ActionButtonProps extends Omit<ButtonProps, 'children'> {
   icon?: LucideIcon;
+  image?: string;
   loadingText?: string;
   label: string;
   iconClassName?: string;
@@ -21,6 +23,7 @@ export function ActionButton({
   className = "w-full",
   // Content props
   icon: Icon,
+  image,
   loadingText = "Please wait...",
   label,
   // Icon props
@@ -62,8 +65,12 @@ export function ActionButton({
         </>
       ) : (
         <>
-          {Icon && showIconOnSubmit && (
-            <Icon className={iconClassName} />
+          {image ? ( // Check if image prop is provided
+            <Image src={image} alt={label} className={iconClassName} width={50} height={50}/> // Render image
+          ) : (
+            Icon && showIconOnSubmit && (
+              <Icon className={iconClassName} />
+            )
           )}
           {label}
         </>

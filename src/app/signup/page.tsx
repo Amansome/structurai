@@ -13,7 +13,11 @@ import { useState } from "react";
 import { generateAndSendOtp, register } from "../actions/auth";
 import { toast } from "@/hooks/use-toast";
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Frame } from "lucide-react";
+import { ActionButton } from "@/components/global/ActionButton";
+import { signIn } from "next-auth/react";
+
+const GoogleLogo = "/googleicon.svg"; 
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -73,11 +77,26 @@ export default function SignUpPage() {
     }
   };
 
+  const handleGoogleSignUp = async () => {
+    await signIn("google", { callbackUrl: "/dashboard" });
+  };
+  
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
       <div className="w-full max-w-sm space-y-6">
         <Card className="p-6">
           <h1 className="mb-4 text-2xl font-bold">Create an account</h1>
+          <div className="mb-6">
+          <ActionButton 
+        onClick={handleGoogleSignUp}
+        image="/googleicon.svg"
+        label="Sign up with Google"
+        loadingText="Please wait"
+        variant="outline"
+        className="w-full"
+        />
+        </div>
 
           <form onSubmit={handleSubmit}>
             {!showOtp ? (

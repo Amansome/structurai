@@ -11,6 +11,7 @@ This project implements a robust authentication system using Next.js, NextAuth.j
 - **Password Management**: Users can reset their passwords securely using OTP verification.
 - **Session Management**: Utilizes JWT for session management, ensuring secure user sessions.
 - **Error Handling**: Comprehensive error handling for authentication processes.
+- **Google Sign-In**: Users can sign in using their Google account for a seamless authentication experience.
 
 ## Technologies Used
 
@@ -56,7 +57,8 @@ This project implements a robust authentication system using Next.js, NextAuth.j
 ### Usage
 
 1. **Register a User**: Navigate to the signup page and fill in the required fields.
-2. **Sign In**: Use the credentials to log in.
+2. **Sign In**: Use the credentials to log in or click on "Sign in with Google" to authenticate using your Google account.
+
 3. **Reset Password**: Follow the prompts to reset your password using OTP verification.
 
 ## Contributing

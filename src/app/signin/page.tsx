@@ -5,9 +5,11 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useActionState, useState } from "react";
 import { authenticate } from "../actions/auth";
-import { EyeOff } from "lucide-react";
+import { EyeOff, Frame } from "lucide-react";
 import { Eye } from "lucide-react";
 import { SignInWithGoogle } from "@/components/auth/SignInWithGoogle";
+import { signIn } from "next-auth/react";
+import { ActionButton } from "@/components/global/ActionButton";
 
 export default function SignUpPage() {
   const [errorMessage, formAction, isPending] = useActionState(
@@ -16,13 +18,24 @@ export default function SignUpPage() {
   );
   const [showPassword, setShowPassword] = useState(false);
 
+  const handleGoogleSignIp = async () => {
+    await signIn("google", { callbackUrl: "/dashboard" });
+  };
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
       <div className="w-full max-w-sm space-y-6">
-        <Card className="p-6 ">
-          <h1 className=" text-2xl font-bold mb-6">Signin to account</h1>
+        <Card className="p-6">
+          <h1 className="mb-6 text-2xl font-bold">Signin to account</h1>
           <div className="mb-6">
-        <SignInWithGoogle />
+            <ActionButton
+              onClick={handleGoogleSignIp}
+              image="/googleicon.svg"
+              label="Sign in with Google"
+              loadingText="Please wait"
+              variant="outline"
+              className="w-full"
+            />{" "}
           </div>
 
           {/* Add your sign-up form fields here */}
@@ -79,15 +92,14 @@ export default function SignUpPage() {
                 )}
               </button>
 
-            <div className="flex mb-6 absolute right-0 
-           justify-between items-center">
-              <Button asChild size={"sm"} variant={'link'} >
-                <Link href="/password/reset">Forgot password?</Link>
-              </Button>
-          </div>
-             </div>
+              <div className="absolute right-0 mb-6 flex items-center justify-between">
+                <Button asChild size={"sm"} variant={"link"}>
+                  <Link href="/password/reset">Forgot password?</Link>
+                </Button>
+              </div>
+            </div>
 
-            <Button disabled={isPending} className="w-full mt-6">
+            <Button disabled={isPending} className="mt-6 w-full">
               {isPending ? "Logging in.." : "Login"}
             </Button>
 

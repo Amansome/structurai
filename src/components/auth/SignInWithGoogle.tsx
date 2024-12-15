@@ -14,7 +14,7 @@ export function SignInWithGoogle() {
         icon={Frame} 
         label="Sign in with Google"
         loadingText="Please wait"
-        variant="default"
+        variant="outline"
         className="w-full"
         />
     </>
