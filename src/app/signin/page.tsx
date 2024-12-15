@@ -21,8 +21,9 @@ export default function SignUpPage() {
       <div className="w-full max-w-sm space-y-6">
         <Card className="p-6 ">
           <h1 className=" text-2xl font-bold mb-6">Signin to account</h1>
-          
+          <div className="mb-6">
         <SignInWithGoogle />
+          </div>
 
           {/* Add your sign-up form fields here */}
           <form action={formAction}>

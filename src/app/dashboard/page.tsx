@@ -13,11 +13,11 @@ export default async function Dashboard() {
   session?.user.id;
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center">
-      <h1>Welcome {session.user.name} </h1>
-      <h1>{session.user.email} Dashboard</h1>
-      <p>Please to see your dashboard.</p>
-      <SignOutButton />
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-6 rounded-lg shadow-lg">
+      <h1 className="text-2xl font-bold text-blue-600">Welcome {session.user.name || "User name"}!</h1>
+      <p className=" text-gray-700">Your email is: {session.user.email || "No email"}</p>
+      <p className="my-4 text-gray-600">Please explore your dashboard.</p>
+      <SignOutButton/>
     </div>
   );
 }
