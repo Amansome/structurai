@@ -80,7 +80,19 @@ export async function register(
     });
 
     if (existingUser) {
-      return "User already exists";
+      // Check if the user signed up with Google
+      const googleAccount = await db.account.findFirst({
+        where: {
+          userId: existingUser.id,
+          provider: 'google',
+        },
+      });
+
+      if (googleAccount) {
+        return "You have already signed up with Google. Please sign in using Google.";
+      }
+
+      return "User already exists. Please sign in with your Email and password.";
     }
 
     const otpRecord = await db.otp.findFirst({

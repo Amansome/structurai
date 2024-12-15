@@ -168,14 +168,12 @@ export default function PasswordReset() {
           </form>
 
           <div className="flex justify-between items-center mt-4">
-            <Button 
-              asChild 
-              size="sm" 
-              variant="link"
-              disabled={isLoading}
-            >
-              <Link href="/signin">Already have an account? Sign in</Link>
-            </Button>
+          <p className="text-center">
+              Already have an account?{" "}
+              <Button asChild size="sm" variant="secondary">
+                <Link href="/signin">Sign in</Link>
+              </Button>
+            </p>
           </div>
         </Card>
       </div>

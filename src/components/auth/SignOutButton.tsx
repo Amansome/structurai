@@ -16,7 +16,6 @@ export function SignOutButton() {
        variant="default"
        className="w-full"
       />
-      <Button type="submit">Signout</Button>
     </form>
   );
 }
