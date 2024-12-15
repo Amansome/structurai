@@ -1,29 +1,68 @@
-# Create T3 App
+# Authentication Project
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+## Overview
 
-## What's next? How do I make an app with this?
+This project implements a robust authentication system using Next.js, NextAuth.js, and Prisma. It supports user registration, sign-in, password reset, and OTP verification, ensuring a secure and user-friendly experience.
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+## Features
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+- **User Registration**: Users can create an account with email and password.
+- **Email Verification**: An OTP is sent to the user's email for verification during registration and password reset.
+- **Password Management**: Users can reset their passwords securely using OTP verification.
+- **Session Management**: Utilizes JWT for session management, ensuring secure user sessions.
+- **Error Handling**: Comprehensive error handling for authentication processes.
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+## Technologies Used
 
-## Learn More
+- **Next.js**: A React framework for building server-side rendered applications.
+- **Auth.js**: Authentication library for Next.js applications.
+- **Prisma**: ORM for database management.
+- **Zod**: Schema validation for user input.
+- **bcryptjs**: Password hashing for secure storage.
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+## Getting Started
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+### Prerequisites
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+- Node.js
+- PostgreSQL (or your preferred database)
 
-## How do I deploy this?
+### Installation
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+1. Clone the repository:   ```bash
+   git clone <repository-url>
+   cd <project-directory>   ```
+
+2. Install dependencies:   ```bash
+   npm install   ```
+
+3. Set up your environment variables:
+   Create a `.env` file in the root directory and add the following:   ```env
+   DATABASE_URL=your_database_url
+   NEXT_PUBLIC_BASE_URL=http://localhost:3000   ```
+
+4. Run database migrations:   ```bash
+   npx prisma migrate dev   ```
+
+5. Start the development server:   ```bash
+   npm run dev   ```
+
+### API Endpoints
+
+- **POST /api/auth/signin**: Sign in a user with email and password.
+- **POST /api/auth/signup**: Register a new user with email and password.
+- **POST /api/password**: Handle password reset requests (OTP generation and verification).
+
+### Usage
+
+1. **Register a User**: Navigate to the signup page and fill in the required fields.
+2. **Sign In**: Use the credentials to log in.
+3. **Reset Password**: Follow the prompts to reset your password using OTP verification.
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request for any enhancements or bug fixes.
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
