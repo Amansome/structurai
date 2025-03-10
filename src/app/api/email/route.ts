@@ -1,12 +1,13 @@
 import nodemailer from 'nodemailer';
 import { NextResponse } from 'next/server';
+import { env } from '@/env';
 
 const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_SERVER_HOST,
-  port: parseInt(process.env.EMAIL_SERVER_PORT || "587"),
+  host: env.EMAIL_SERVER_HOST,
+  port: parseInt(env.EMAIL_SERVER_PORT || "587"),
   auth: {
-    user: process.env.EMAIL_SERVER_USER,
-    pass: process.env.EMAIL_SERVER_PASSWORD,
+    user: env.EMAIL_SERVER_USER,
+    pass: env.EMAIL_SERVER_PASSWORD,
   },
 });
 
@@ -15,9 +16,9 @@ export async function POST(request: Request) {
     const { email, otp } = await request.json();
 
     await transporter.sendMail({
-      from: '"FormAI" <cs@mzed.studio>',
+      from: `"FormAI" <${env.EMAIL_FROM}>`,
       to: email,
-      subject: "Verifcation code for FormAI",
+      subject: "Verification code for FormAI",
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ccc; border-radius: 5px;">
           <h2>Your OTP Code</h2>

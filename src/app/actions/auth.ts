@@ -1,63 +1,209 @@
 "use server";
 
-import { signUpSchema } from "@/schema";
+import { env } from "@/env";
+import { logger } from "@/lib/logger";
+import { signUpSchema, passwordSchema } from "@/schema";
+import { signIn } from "@/server/auth";
 import { db } from "@/server/db";
-import { ZodError } from "zod";
 import bcrypt from "bcryptjs";
-import { signIn, signOut } from "@/server/auth";
-import { AuthError } from "next-auth";
 import { addMinutes } from "date-fns";
+import { AuthError } from "next-auth";
+import { ZodError } from "zod";
 
-export async function SignOut() {
-  await signOut();
+
+// Define the AuthenticateResponse type interface
+export interface AuthenticateResponse {
+  error: string | null;
+  success: boolean;
 }
 
 export async function authenticate(
-  prevState: string | undefined,
-  formData: FormData,
-) {
+  _prevState: AuthenticateResponse | undefined,
+  formData: FormData
+): Promise<AuthenticateResponse> {
+
+  const redirectTo = formData.get("redirectTo") as string || "/dashboard";
   try {
-    await signIn("credentials", formData);
+    // Instead of returning "success", return the result directly
+    const result = await signIn("credentials", {
+      email: formData.get("email"),
+      password: formData.get("password"),
+      redirect: false // Prevent Next Auth from handling redirects
+    });
+
+    if (result?.error) {
+      return { error: "Please enter correct email and password.", success: false };
+    }
+
+    return { error: null, success: true }; 
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
         case "CredentialsSignin":
-          return "Please enter correct email and password.";
+          return {error: "Please enter correct email and password.", success: false};
         default:
-          return "Something went wrong.";
+          return { error: "Something went wrong.", success: false };
       }
     }
     throw error;
   }
 }
 
-async function sendOtp(email: string, otp: string) {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/email`, { 
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, otp }),
-  });
+export async function sendOtp(email: string, otp: string, type: string) {
+  try {
+    const response = await fetch(`${env.NEXT_PUBLIC_BASE_URL}/api/email`, { 
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, otp, type }),
+    });
 
-  if (!response.ok) {
-    throw new Error('Failed to send OTP email');
+    if (!response.ok) {
+      const errorData = await response.json();
+      logger.error("Failed to send OTP email:", errorData);
+      throw new Error(`Failed to send OTP email: ${errorData.message || response.statusText}`);
+    }
+    
+    return true;
+  } catch (error) {
+    logger.error("Error sending OTP:", error);
+    throw error;
   }
 }
 
-export async function generateAndSendOtp(email: string) {
-  const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate a 6-digit OTP
-  const expiresAt = addMinutes(new Date(), 5); // Set expiration time to 5 minutes
+export async function generateAndSendOtp(
+  email: string, 
+  type = "registration", 
+  existenceCheck = "prevent" // "prevent", "require", or "none"
+) {
+  try {
+    // Check user existence based on the existenceCheck parameter
+    if (existenceCheck !== "none") {
+      const existingUser = await db.user.findUnique({
+        where: { email }
+      });
 
-  await db.otp.create({
-    data: {
-      email,
-      otp,
-      expiresAt,
-    },
-  });
+      if (existenceCheck === "prevent" && existingUser) {
+        // For registration: prevent if user exists
+        // Check if the user signed up with Google
+        const googleAccount = await db.account.findFirst({
+          where: {
+            userId: existingUser.id,
+            provider: 'google',
+          },
+        });
 
-  await sendOtp(email, otp);
+        if (googleAccount) {
+          throw new Error("You have already signed up with Google. Please sign in using Google.");
+        }
+
+        throw new Error("User already exists. Please sign in with your Email and password.");
+      } else if (existenceCheck === "require" && !existingUser) {
+        // For password reset: require that user exists
+        throw new Error("No account found with this email address.");
+      }
+    }
+    
+    // Generate a 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = addMinutes(new Date(), 10); // Set expiration time to 10 minutes
+    
+    // Use a transaction to ensure data consistency
+    await db.$transaction(async (tx) => {
+      // Invalidate any existing OTPs for this email and type
+      await tx.otp.updateMany({
+        where: {
+          email,
+          type,
+          status: {
+            in: ["pending", "verified"]
+          }
+        },
+        data: {
+          status: "expired"
+        }
+      });
+
+      // Create new OTP
+      await tx.otp.create({
+        data: {
+          email,
+          otp,
+          expiresAt,
+          type,
+          status: "pending"
+        },
+      });
+    });
+
+    await sendOtp(email, otp, type);
+    return "OTP sent successfully. Please check your email.";
+  } catch (error) {
+    logger.error("Error generating OTP:", {
+      message: "Failed to generate and send OTP",
+      error: error instanceof Error ? { message: error.message, stack: error.stack } : String(error),
+    });
+    
+    // Re-throw the error with its original message if it's already an Error object
+    if (error instanceof Error) {
+      throw error;
+    }
+    
+    throw new Error("Failed to generate and send OTP. Please try again.");
+  }
+}
+
+type OtpVerificationResult = {
+  verified: boolean;
+  message?: string;
+  otpId?: string;
+};
+
+export async function verifyOtp(email: string, otp: string, type: string): Promise<OtpVerificationResult> {
+  try {
+    let result: OtpVerificationResult = {
+      verified: false,
+      message: "Invalid or expired OTP."
+    };
+    
+    await db.$transaction(async (tx) => {
+      const otpRecord = await tx.otp.findFirst({
+        where: {
+          email,
+          otp,
+          type,
+          status: "pending",
+          expiresAt: {
+            gte: new Date(),
+          },
+        },
+      });
+
+      if (!otpRecord) {
+        return;
+      }
+
+      // Mark OTP as verified
+      await tx.otp.update({
+        where: { id: otpRecord.id },
+        data: { status: "verified" }
+      });
+
+      result = { 
+        verified: true, 
+        otpId: otpRecord.id 
+      };
+    });
+
+    return result;
+  } catch (error) {
+    logger.error("Error verifying OTP:", error);
+    return { 
+      verified: false, 
+      message: "Error verifying OTP. Please try again." 
+    };
+  }
 }
 
 export async function register(
@@ -67,16 +213,21 @@ export async function register(
   const otp = formData.get("otp") as string;
 
   try {
-    const { email, password } = await signUpSchema.parseAsync({
+    // Validate input data
+    const validationResult = await signUpSchema.safeParseAsync({
       email: formData.get("email"),
       password: formData.get("password"),
     });
 
+    if (!validationResult.success) {
+      return validationResult.error.errors.map((error) => error.message).join(", ");
+    }
+
+    const { email, password } = validationResult.data;
+
     // Check if the user already exists
     const existingUser = await db.user.findUnique({
-      where: {
-        email: email,
-      },
+      where: { email }
     });
 
     if (existingUser) {
@@ -95,39 +246,50 @@ export async function register(
       return "User already exists. Please sign in with your Email and password.";
     }
 
-    const otpRecord = await db.otp.findFirst({
-      where: {
-        email,
-        otp,
-        expiresAt: {
-          gte: new Date(),
-        },
-      },
-    });
-
-    if (!otpRecord) {
-      return "Invalid or expired OTP.";
+    // Validate password complexity
+    const passwordValidation = passwordSchema.safeParse(password);
+    if (!passwordValidation.success) {
+      return passwordValidation.error.errors.map((error) => error.message).join(", ");
     }
 
+    // Verify OTP
+    const otpVerification = await verifyOtp(email, otp, "registration");
+    if (!otpVerification.verified) {
+      return otpVerification.message || "Invalid OTP.";
+    }
+
+    if (!otpVerification.otpId) {
+      return "OTP verification failed. Please try again.";
+    }
+
+    // Hash password
     const hash = await bcrypt.hash(password, 10);
+    
+    // Use a transaction for user creation and related operations
+    await db.$transaction(async (tx) => {
+      // Create user - directly set emailVerified and isActive
+      const user = await tx.user.create({
+        data: {
+          email,
+          password: hash,
+          emailVerified: new Date(), // Mark as verified immediately
+          isActive: true, // Set account as active
+        },
+      });
 
-    await db.user.create({
-      data: {
-        email: email,
-        password: hash,
-      },
+      // Mark OTP as used
+      await tx.otp.update({
+        where: { id: otpVerification.otpId },
+        data: { status: "used" }
+      });
     });
 
-    await db.otp.delete({
-      where: { id: otpRecord.id },
-    });
-
-    // Log the user in after successful registration
-    await signIn("credentials", { email, password });
-
+    return "Registration successful! You can now log in with your email and password.";
   } catch (error) {
+    logger.error("Error during registration:", error);
     if (error instanceof ZodError) {
       return error.errors.map((error) => error.message).join(", ");
     }
+    return "An error occurred during registration. Please try again.";
   }
 }

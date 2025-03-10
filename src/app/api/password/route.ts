@@ -33,7 +33,7 @@ export async function POST(request: Request) {
         
         // Generate and send OTP
         try {
-          await generateAndSendOtp(body.email);
+          await generateAndSendOtp(body.email, "password-reset", "require");
           return NextResponse.json({ success: true });
         } catch (otpError) {
           console.error('OTP generation or sending failed:', otpError);

@@ -20,13 +20,11 @@ This project implements a robust authentication system using Next.js, NextAuth.j
 - **Prisma**: ORM for database management.
 - **Zod**: Schema validation for user input.
 - **bcryptjs**: Password hashing for secure storage.
+- **Nodemailer**: Email sending for OTP verification.
+- **SMTP2G0**: Email sending for OTP verification - Use your preferred email sending service.
+- **Neon**: Database hosting - Use your preferred database hosting service.
 
 ## Getting Started
-
-### Prerequisites
-
-- Node.js
-- PostgreSQL (or your preferred database)
 
 ### Installation
 
@@ -35,18 +33,17 @@ This project implements a robust authentication system using Next.js, NextAuth.j
    cd <project-directory>   ```
 
 2. Install dependencies:   ```bash
-   npm install   ```
+   pnpm install   ```
 
 3. Set up your environment variables:
-   Create a `.env` file in the root directory and add the following:   ```env
-   DATABASE_URL=your_database_url
-   NEXT_PUBLIC_BASE_URL=http://localhost:3000   ```
+   Create a `.env` file in the root directory and add the following and copy the .env.example file to .env file and add your own values:
 
 4. Run database migrations:   ```bash
    npx prisma migrate dev   ```
 
 5. Start the development server:   ```bash
-   npm run dev   ```
+   pnpm dev   ```
+
 
 ### API Endpoints
 
@@ -61,9 +58,23 @@ This project implements a robust authentication system using Next.js, NextAuth.j
 
 3. **Reset Password**: Follow the prompts to reset your password using OTP verification.
 
+
+## What's not implemented, yet!
+
+### Rate Limiting
+Recommendation: https://arcjet.com/ 
+
+- **Rate Limiting**: Implement rate limiting to prevent abuse of the API endpoints.
+
+- **Email Verification**: Implement email verification in signupto ensure that the user's email address is valid.
+
+- **Email Sending**: Implement rate for email sending for OTP verification.
+
+
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request for any enhancements or bug fixes.
+
 
 ## License
 
