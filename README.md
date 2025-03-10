@@ -28,21 +28,28 @@ This project implements a robust authentication system using Next.js, NextAuth.j
 
 ### Installation
 
-1. Clone the repository:   ```bash
-   git clone <repository-url>
-   cd <project-directory>   ```
+1. Clone the repository:
+```bash
+git clone https://github.com/raymond-UI/Nextjs-auth.git
+```
 
-2. Install dependencies:   ```bash
-   pnpm install   ```
+3. Install dependencies:
+```bash
+   pnpm install
+```
 
-3. Set up your environment variables:
+4. Set up your environment variables:
    Create a `.env` file in the root directory and add the following and copy the .env.example file to .env file and add your own values:
 
-4. Run database migrations:   ```bash
-   npx prisma migrate dev   ```
+5. Run database migrations:
+```bash
+   npx prisma migrate dev
+```
 
-5. Start the development server:   ```bash
-   pnpm dev   ```
+7. Start the development server:
+```bash
+   pnpm dev
+```
 
 
 ### API Endpoints
