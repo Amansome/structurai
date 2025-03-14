@@ -63,13 +63,20 @@ export default function StructurAIPage() {
         }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to process idea");
+      setProcessingStatus("Processing your idea...");
+      
+      // Handle non-JSON responses
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const textResponse = await response.text();
+        throw new Error(`Server returned non-JSON response: ${textResponse.substring(0, 100)}...`);
       }
 
-      setProcessingStatus("Processing your idea...");
       const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || `API error: ${response.status} ${response.statusText}`);
+      }
       
       if (!data.output) {
         throw new Error("No output received from API");

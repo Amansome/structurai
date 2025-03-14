@@ -77,43 +77,81 @@ export async function POST(request: NextRequest) {
     const userPrompt = `${templatePrompt}\n\nHere's the idea:\n${input}\n\nIMPORTANT: Format your response as plain text with clear headings, consistent spacing, and standard bullet points/numbering that will copy-paste cleanly into any software. Avoid any special characters or formatting that might not transfer well.`;
 
     // Call the OpenRouter API with DeepSeek model
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${API_KEY}`,
-        "HTTP-Referer": "https://structurai.vercel.app",
-        "X-Title": "StructurAI"
-      },
-      body: JSON.stringify({
-        model: "deepseek/deepseek-r1-distill-llama-70b:free",
-        messages: [
-          {
-            role: "system",
-            content: systemPrompt
-          },
-          {
-            role: "user",
-            content: userPrompt
-          }
-        ],
-        temperature: 0.5,
-        max_tokens: 2500,
-        top_p: 0.9,
-        frequency_penalty: 0.2,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("OpenRouter API error:", errorData);
+    let response;
+    try {
+      response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${API_KEY}`,
+          "HTTP-Referer": "https://structurai.vercel.app",
+          "X-Title": "StructurAI"
+        },
+        body: JSON.stringify({
+          model: "deepseek/deepseek-r1-distill-llama-70b:free",
+          messages: [
+            {
+              role: "system",
+              content: systemPrompt
+            },
+            {
+              role: "user",
+              content: userPrompt
+            }
+          ],
+          temperature: 0.5,
+          max_tokens: 2500,
+          top_p: 0.9,
+          frequency_penalty: 0.2,
+        }),
+      });
+    } catch (fetchError) {
+      console.error("Fetch error:", fetchError);
       return NextResponse.json(
-        { error: "Failed to process with OpenRouter API: " + (errorData.error?.message || "Unknown error") },
+        { error: "Failed to connect to OpenRouter API: " + (fetchError instanceof Error ? fetchError.message : "Network error") },
         { status: 500 }
       );
     }
 
-    const data = await response.json();
+    // Handle non-JSON responses from OpenRouter
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const textResponse = await response.text();
+      console.error("OpenRouter non-JSON response:", textResponse);
+      return NextResponse.json(
+        { error: "OpenRouter API returned non-JSON response" },
+        { status: 500 }
+      );
+    }
+
+    // Parse the JSON response
+    let data;
+    try {
+      data = await response.json();
+    } catch (jsonError) {
+      console.error("JSON parsing error:", jsonError);
+      return NextResponse.json(
+        { error: "Failed to parse OpenRouter API response" },
+        { status: 500 }
+      );
+    }
+
+    if (!response.ok) {
+      console.error("OpenRouter API error:", data);
+      return NextResponse.json(
+        { error: "Failed to process with OpenRouter API: " + (data.error?.message || data.message || "Unknown error") },
+        { status: 500 }
+      );
+    }
+
+    // Validate the response structure
+    if (!data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.content) {
+      console.error("Invalid OpenRouter API response structure:", data);
+      return NextResponse.json(
+        { error: "Invalid response structure from OpenRouter API" },
+        { status: 500 }
+      );
+    }
     
     // Process the response to ensure clean formatting
     let formattedOutput = data.choices[0].message.content;
