@@ -13,19 +13,47 @@ export const env = createEnv({
         : z.string().optional(),
     // AUTH_DISCORD_ID: z.string(),
     // AUTH_DISCORD_SECRET: z.string(),
-    DATABASE_URL: z.string().url(),
+    DATABASE_URL: 
+      process.env.NODE_ENV === "production"
+        ? z.string().url().optional()
+        : z.string().url(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
-      EMAIL_SERVER_PASSWORD: z.string(),
-      EMAIL_SERVER_USER: z.string(),
-      EMAIL_SERVER_HOST: z.string(),
-      EMAIL_SERVER_PORT: z.string(),
-      AUTH_GOOGLE_ID: z.string(),
-      AUTH_GOOGLE_SECRET: z.string(),
-      EMAIL_FROM: z.string(),
-      BASE_URL: z.string().url(),
-
+    EMAIL_SERVER_PASSWORD: 
+      process.env.NODE_ENV === "production"
+        ? z.string().optional()
+        : z.string(),
+    EMAIL_SERVER_USER: 
+      process.env.NODE_ENV === "production"
+        ? z.string().optional()
+        : z.string(),
+    EMAIL_SERVER_HOST: 
+      process.env.NODE_ENV === "production"
+        ? z.string().optional()
+        : z.string(),
+    EMAIL_SERVER_PORT: 
+      process.env.NODE_ENV === "production"
+        ? z.string().optional()
+        : z.string(),
+    AUTH_GOOGLE_ID: 
+      process.env.NODE_ENV === "production"
+        ? z.string().optional()
+        : z.string(),
+    AUTH_GOOGLE_SECRET: 
+      process.env.NODE_ENV === "production"
+        ? z.string().optional()
+        : z.string(),
+    EMAIL_FROM: 
+      process.env.NODE_ENV === "production"
+        ? z.string().optional()
+        : z.string(),
+    BASE_URL: z.string().url(),
+    META_LLAMA_API_KEY: 
+      process.env.NODE_ENV === "production"
+        ? z.string().optional()
+        : z.string(),
+    OPENROUTER_API_KEY: z.string(),
   },
 
   /**
@@ -57,6 +85,8 @@ export const env = createEnv({
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
     AUTH_GOOGLE_ID: process.env.AUTH_GOOGLE_ID,
     AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET,
+    META_LLAMA_API_KEY: process.env.META_LLAMA_API_KEY,
+    OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

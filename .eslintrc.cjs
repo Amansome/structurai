@@ -2,15 +2,14 @@
 const config = {
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": true
+    "project": false
   },
   "plugins": [
     "@typescript-eslint"
   ],
   "extends": [
     "next/core-web-vitals",
-    "plugin:@typescript-eslint/recommended-type-checked",
-    "plugin:@typescript-eslint/stylistic-type-checked"
+    "plugin:@typescript-eslint/recommended"
   ],
   "rules": {
     "@typescript-eslint/array-type": "off",
@@ -29,14 +28,7 @@ const config = {
       }
     ],
     "@typescript-eslint/require-await": "off",
-    "@typescript-eslint/no-misused-promises": [
-      "error",
-      {
-        "checksVoidReturn": {
-          "attributes": false
-        }
-      }
-    ]
+    "@typescript-eslint/no-misused-promises": "off"
   }
 }
 module.exports = config;

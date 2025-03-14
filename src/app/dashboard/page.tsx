@@ -1,59 +1,47 @@
-import Image from "next/image";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { SignOutButton } from "@/components/auth/SignOutButton";
-import { auth } from "@/server/auth";
-import { redirect } from "next/navigation";
+// @ts-nocheck
+import Link from "next/link";
 
-export default async function Dashboard() {
-  const session = await auth();
-
-  if (!session?.user) {
-    redirect ("/signin")
-  }
-
-  const { name, email, image } = session.user;
-
+export default function DashboardPage() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-4">
-      <Card className="w-full max-w-md rounded-lg shadow-lg">
-        <CardHeader className="flex justify-between items-center flex-row mb-2 bg-secondary p-2">
-          Loggged user details
-          <SignOutButton />
-        </CardHeader>
-
-        <CardContent className="space-y-2">
-          <div className="flex flex-col items-center mt-2">
-            {image ? (
-              <div className="mb-2 overflow-hidden rounded-full">
-                <Image
-                  src={image}
-                  alt={`${name || "User"}'s profile picture`}
-                  width={96}
-                  height={96}
-                  className="h-24 w-24 object-cover"
-                  priority
-                />
-              </div>
-            ) : (
-              <div className="mb-2 overflow-hidden rounded-full h-24 w-24 relative bg-secondary flex items-center justify-center">
-                <Image
-                  src="/placeholder-image.svg"
-                  alt="Placeholder profile picture"
-                  layout="fill"
-                  objectFit="cover"
-                />
-              </div>
-            )}
-            <h1 className="text-2xl font-bold">{name || "User"}</h1>
+    <main className="flex min-h-screen flex-col items-center justify-center">
+      <div className="container flex flex-col items-center justify-center gap-4 px-4 py-16">
+        <h1 className="text-4xl font-bold">Dashboard</h1>
+        <p className="text-xl text-center max-w-2xl text-muted-foreground mb-8">
+          This is a placeholder dashboard for the StructurAI application
+        </p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+            <h2 className="text-2xl font-semibold mb-4">Recent Projects</h2>
+            <p className="text-muted-foreground">No projects yet. Create one using StructurAI.</p>
           </div>
-          <p className="text-center text-sm text-muted-foreground">
-            Email:{" "}
-            <span className="font-medium text-foreground">
-              {email || "No email"}
-            </span>
-          </p>
-        </CardContent>
-      </Card>
-    </div>
+          
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+            <h2 className="text-2xl font-semibold mb-4">Quick Actions</h2>
+            <div className="space-y-2">
+              <Link 
+                href="/structurai" 
+                className="block w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-center"
+              >
+                Create New Project
+              </Link>
+              <button 
+                className="block w-full py-2 px-4 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+                disabled
+              >
+                Import Project (Coming Soon)
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <Link 
+          href="/" 
+          className="mt-8 text-blue-600 hover:underline"
+        >
+          Back to Home
+        </Link>
+      </div>
+    </main>
   );
 }

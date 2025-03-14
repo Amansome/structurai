@@ -2,10 +2,12 @@ import "@/styles/globals.css";
 import { Inter } from "next/font/google";
 import { type Metadata } from "next";
 import { Toaster } from "@/components/ui/toaster";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export const metadata: Metadata = {
-  title: "Nextjs Authentication",
-  description: "Create Nextjs app with Google and Credential Authentication",
+  title: "StructurAI",
+  description: "Transform your unstructured ideas into structured app development plans",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
@@ -15,10 +17,15 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${inter.className}`}>
-      <body>{children}
-      <Toaster />
-
+    <html lang="en" className={`${inter.className}`} suppressHydrationWarning>
+      <body>
+        <ThemeProvider defaultTheme="system" storageKey="structurai-theme">
+          <div className="fixed top-4 right-4 z-50">
+            <ThemeToggle />
+          </div>
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
