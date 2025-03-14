@@ -69,6 +69,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log("API Key available (first 10 chars):", API_KEY.substring(0, 10) + "...");
+
     // Select the appropriate template
     const templatePrompt = templates[template as keyof typeof templates] || templates.default;
     
@@ -79,11 +81,14 @@ export async function POST(request: NextRequest) {
     // Call the OpenRouter API with DeepSeek model
     let response;
     try {
+      // Ensure API key is properly formatted
+      const authHeader = API_KEY.startsWith('Bearer ') ? API_KEY : `Bearer ${API_KEY}`;
+      
       response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${API_KEY}`,
+          "Authorization": authHeader,
           "HTTP-Referer": "https://structurai.vercel.app",
           "X-Title": "StructurAI"
         },
@@ -105,6 +110,8 @@ export async function POST(request: NextRequest) {
           frequency_penalty: 0.2,
         }),
       });
+      
+      console.log("OpenRouter API response status:", response.status);
     } catch (fetchError) {
       console.error("Fetch error:", fetchError);
       return NextResponse.json(
@@ -119,7 +126,7 @@ export async function POST(request: NextRequest) {
       const textResponse = await response.text();
       console.error("OpenRouter non-JSON response:", textResponse);
       return NextResponse.json(
-        { error: "OpenRouter API returned non-JSON response" },
+        { error: "OpenRouter API returned non-JSON response: " + textResponse.substring(0, 100) },
         { status: 500 }
       );
     }
@@ -137,7 +144,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!response.ok) {
-      console.error("OpenRouter API error:", data);
+      console.error("OpenRouter API error:", JSON.stringify(data));
       return NextResponse.json(
         { error: "Failed to process with OpenRouter API: " + (data.error?.message || data.message || "Unknown error") },
         { status: 500 }
@@ -146,7 +153,7 @@ export async function POST(request: NextRequest) {
 
     // Validate the response structure
     if (!data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.content) {
-      console.error("Invalid OpenRouter API response structure:", data);
+      console.error("Invalid OpenRouter API response structure:", JSON.stringify(data));
       return NextResponse.json(
         { error: "Invalid response structure from OpenRouter API" },
         { status: 500 }
