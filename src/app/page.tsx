@@ -41,14 +41,42 @@ export default function HomePage() {
           </Link>
         </div>
         
+        {/* Feature description */}
         <div 
-          className={`mt-16 w-full max-w-3xl h-[1px] bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent transition-all duration-1000 delay-700 ${
+          className={`mt-16 w-full max-w-4xl transition-all duration-1000 delay-700 transform ${
+            isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+          }`}
+        >
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
+            <h2 className="text-2xl font-semibold mb-4">What is StructurAI?</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
+              StructurAI is an AI-powered tool that helps you transform your ideas into structured app development plans. 
+              Simply describe your idea, and StructurAI will generate a comprehensive plan including:
+            </p>
+            <ul className="list-disc pl-6 space-y-2 text-gray-600 dark:text-gray-300 mb-6">
+              <li>Project structure and architecture</li>
+              <li>Component breakdown</li>
+              <li>Implementation steps</li>
+              <li>Technology recommendations</li>
+              <li>Potential challenges and solutions</li>
+            </ul>
+            <Link 
+              href="/structurai" 
+              className="inline-block px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Get Started Now
+            </Link>
+          </div>
+        </div>
+        
+        <div 
+          className={`mt-16 w-full max-w-3xl h-[1px] bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent transition-all duration-1000 delay-900 ${
             isLoaded ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0"
           }`}
         />
         
         <p 
-          className={`mt-8 text-sm text-gray-500 dark:text-gray-400 transition-all duration-1000 delay-900 ${
+          className={`mt-8 text-sm text-gray-500 dark:text-gray-400 transition-all duration-1000 delay-1000 ${
             isLoaded ? "opacity-100" : "opacity-0"
           }`}
         >

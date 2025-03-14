@@ -1,46 +1,44 @@
-import { auth } from "./server/auth";
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
+// Define routes that don't require authentication
+const publicRoutes = ['/', '/signin', '/signup', '/password/reset'];
+// Define routes that require authentication
+const protectedRoutes = ['/dashboard', '/structurai', '/brain-dumper'];
 
-const AUTH_ROUTES = ['/signin', '/signup', '/password/reset'];
-const DEFAULT_REDIRECT = '/dashboard';
-
-export default auth((req) => {
-  try {
-    // If user is not authenticated and tries to access protected routes
-    if (!req.auth && !AUTH_ROUTES.includes(req.nextUrl.pathname)) {
-      const signInUrl = new URL("/signin", req.nextUrl.origin);
-      return new Response(null, {
-        status: 302,
-        headers: {
-          Location: signInUrl.toString(),
-          'Cache-Control': 'no-store, no-cache, must-revalidate'
-        }
-      });
-    }
-
-    // If user is authenticated but tries to access auth pages
-    if (req.auth && AUTH_ROUTES.includes(req.nextUrl.pathname)) {
-      const dashboardUrl = new URL(DEFAULT_REDIRECT, req.nextUrl.origin);
-      return new Response(null, {
-        status: 302,
-        headers: {
-          Location: dashboardUrl.toString(),
-          'Cache-Control': 'no-store, no-cache, must-revalidate'
-        }
-      });
-    }
-  } catch (error) {
-    console.error('Auth middleware error:', error);
-    return new Response(null, { status: 500 });
+export function middleware(request: NextRequest) {
+  const url = request.nextUrl.clone();
+  
+  // Redirect authentication and dashboard routes to home page
+  if (url.pathname === '/signin' || 
+      url.pathname === '/signup' || 
+      url.pathname === '/password/reset' || 
+      url.pathname === '/dashboard' ||
+      url.pathname.startsWith('/dashboard/')) {
+    url.pathname = '/';
+    return NextResponse.redirect(url);
   }
-});
+  
+  // Redirect brain-dumper to structurai
+  if (url.pathname === '/brain-dumper' ||
+      url.pathname.startsWith('/brain-dumper/')) {
+    url.pathname = '/structurai';
+    return NextResponse.redirect(url);
+  }
+  
+  // Allow access to all other routes
+  return NextResponse.next();
+}
 
-// Fixed: Static matcher configuration
+// Match only specific routes
 export const config = {
   matcher: [
+    '/',
     '/dashboard/:path*',
     '/signin',
     '/signup',
-    '/password/reset'
+    '/password/reset',
+    '/structurai',
+    '/brain-dumper'
   ]
 };

@@ -29,6 +29,9 @@ declare module "next-auth" {
   // }
 }
 
+// Check if we're in a Node.js environment (not Edge Runtime)
+const isNode = typeof process !== 'undefined' && process.versions && process.versions.node;
+
 /**
  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
  *
@@ -85,7 +88,8 @@ export const authConfig = {
     signIn: "/signin",
     error: "/signin",
   },
-  adapter: PrismaAdapter(db),
+  // Only use PrismaAdapter in Node.js environment, not in Edge Runtime
+  ...(isNode ? { adapter: PrismaAdapter(db) } : {}),
   callbacks: {
     session: ({ session, token }) => ({
       ...session,

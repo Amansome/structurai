@@ -162,6 +162,32 @@ type OtpVerificationResult = {
 
 export async function verifyOtp(email: string, otp: string, type: string): Promise<OtpVerificationResult> {
   try {
+    // In development mode, automatically verify any OTP
+    if (env.NODE_ENV !== 'production') {
+      console.log('==================================');
+      console.log(`🔑 DEVELOPMENT MODE: Auto-verifying OTP`);
+      console.log(`🔑 Email: ${email}`);
+      console.log(`🔑 OTP: ${otp}`);
+      console.log(`🔑 Type: ${type}`);
+      console.log('==================================');
+      
+      // Find or create an OTP record for development
+      const otpRecord = await db.otp.findFirst({
+        where: {
+          email,
+          type,
+        },
+      });
+      
+      const otpId = otpRecord?.id || 'dev-auto-verified';
+      
+      return { 
+        verified: true, 
+        otpId: otpId
+      };
+    }
+    
+    // Production verification logic
     let result: OtpVerificationResult = {
       verified: false,
       message: "Invalid or expired OTP."
@@ -258,7 +284,10 @@ export async function register(
       return otpVerification.message || "Invalid OTP.";
     }
 
-    if (!otpVerification.otpId) {
+    // Special handling for development mode auto-verification
+    const isDevAutoVerified = otpVerification.otpId === 'dev-auto-verified';
+    
+    if (!isDevAutoVerified && !otpVerification.otpId) {
       return "OTP verification failed. Please try again.";
     }
 
@@ -277,14 +306,16 @@ export async function register(
         },
       });
 
-      // Mark OTP as used
-      await tx.otp.update({
-        where: { id: otpVerification.otpId },
-        data: { status: "used" }
-      });
+      // Mark OTP as used (only in production or if we have a real OTP ID)
+      if (!isDevAutoVerified && otpVerification.otpId) {
+        await tx.otp.update({
+          where: { id: otpVerification.otpId },
+          data: { status: "used" }
+        });
+      }
     });
 
-    return "Registration successful! You can now log in with your email and password.";
+    return null; // Success - no error message
   } catch (error) {
     logger.error("Error during registration:", error);
     if (error instanceof ZodError) {

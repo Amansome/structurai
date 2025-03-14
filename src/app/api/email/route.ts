@@ -2,20 +2,35 @@ import nodemailer from 'nodemailer';
 import { NextResponse } from 'next/server';
 import { env } from '@/env';
 
-const transporter = nodemailer.createTransport({
-  host: env.EMAIL_SERVER_HOST,
-  port: parseInt(env.EMAIL_SERVER_PORT || "587"),
-  auth: {
-    user: env.EMAIL_SERVER_USER,
-    pass: env.EMAIL_SERVER_PASSWORD,
-  },
-});
+// Only create a real transporter in production
+const transporter = env.NODE_ENV === 'production' 
+  ? nodemailer.createTransport({
+      host: env.EMAIL_SERVER_HOST,
+      port: parseInt(env.EMAIL_SERVER_PORT || "587"),
+      auth: {
+        user: env.EMAIL_SERVER_USER,
+        pass: env.EMAIL_SERVER_PASSWORD,
+      },
+    })
+  : null; // No transporter in development
 
 export async function POST(request: Request) {
   try {
-    const { email, otp } = await request.json();
+    const { email, otp, type } = await request.json();
 
-    await transporter.sendMail({
+    // In development, just log the OTP and return success
+    if (env.NODE_ENV !== 'production') {
+      console.log('==================================');
+      console.log(`📧 DEVELOPMENT MODE: Email not actually sent`);
+      console.log(`📧 Would have sent email to: ${email}`);
+      console.log(`📧 OTP: ${otp}`);
+      console.log(`📧 Type: ${type || 'registration'}`);
+      console.log('==================================');
+      return NextResponse.json({ success: true });
+    }
+
+    // In production, actually send the email
+    await transporter?.sendMail({
       from: `"FormAI" <${env.EMAIL_FROM}>`,
       to: email,
       subject: "Verification code for FormAI",
