@@ -49,7 +49,7 @@ Format the output in a clean, copy-paste friendly format with proper headings, b
 };
 
 // Get API key from environment variables
-const API_KEY = process.env.OPENROUTER_API_KEY;
+const API_KEY = process.env.DEEPSEEK_API_KEY;
 
 export async function POST(request: NextRequest) {
   try {
