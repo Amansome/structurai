@@ -48,7 +48,7 @@ export default function StructurAIPage() {
     }
 
     setIsProcessing(true);
-    setProcessingStatus("Sending request to DeepSeek AI...");
+    setProcessingStatus("Sending request to Gemini AI...");
     setOutputPlan("");
     
     try {
@@ -292,7 +292,7 @@ export default function StructurAIPage() {
                 ) : "Process My Idea"}
               </Button>
               <p className="text-xs text-center text-gray-500 dark:text-gray-400">
-                Powered by DeepSeek R1 Distill Llama 70B
+                Powered by Google Gemini 1.5 Pro
               </p>
             </CardFooter>
           </Card>

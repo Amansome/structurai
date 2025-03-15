@@ -49,7 +49,7 @@ Format the output in a clean, copy-paste friendly format with proper headings, b
 };
 
 // Get API key from environment variables
-const API_KEY = process.env.DEEPSEEK_API_KEY;
+const API_KEY = process.env.GEMINI_API_KEY;
 
 export async function POST(request: NextRequest) {
   try {
@@ -78,55 +78,52 @@ export async function POST(request: NextRequest) {
     const systemPrompt = "You are an expert app development planner that helps users structure their ideas into comprehensive development plans. Your output should be formatted in a way that can be directly copied and pasted into other software without formatting issues.";
     const userPrompt = `${templatePrompt}\n\nHere's the idea:\n${input}\n\nIMPORTANT: Format your response as plain text with clear headings, consistent spacing, and standard bullet points/numbering that will copy-paste cleanly into any software. Avoid any special characters or formatting that might not transfer well.`;
 
-    // Call the OpenRouter API with DeepSeek model
+    // Call the Gemini API
     let response;
     try {
-      // Ensure API key is properly formatted
-      const authHeader = API_KEY.startsWith('Bearer ') ? API_KEY : `Bearer ${API_KEY}`;
+      // Gemini API endpoint
+      const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${API_KEY}`;
       
-      response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      response = await fetch(geminiEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": authHeader,
-          "HTTP-Referer": "https://structurai.vercel.app",
-          "X-Title": "StructurAI"
         },
         body: JSON.stringify({
-          model: "deepseek/deepseek-r1-distill-llama-70b:free",
-          messages: [
-            {
-              role: "system",
-              content: systemPrompt
-            },
+          contents: [
             {
               role: "user",
-              content: userPrompt
+              parts: [
+                {
+                  text: `${systemPrompt}\n\n${userPrompt}`
+                }
+              ]
             }
           ],
-          temperature: 0.5,
-          max_tokens: 2500,
-          top_p: 0.9,
-          frequency_penalty: 0.2,
+          generationConfig: {
+            temperature: 0.5,
+            maxOutputTokens: 2500,
+            topP: 0.9,
+          },
         }),
       });
       
-      console.log("OpenRouter API response status:", response.status);
+      console.log("Gemini API response status:", response.status);
     } catch (fetchError) {
       console.error("Fetch error:", fetchError);
       return NextResponse.json(
-        { error: "Failed to connect to OpenRouter API: " + (fetchError instanceof Error ? fetchError.message : "Network error") },
+        { error: "Failed to connect to Gemini API: " + (fetchError instanceof Error ? fetchError.message : "Network error") },
         { status: 500 }
       );
     }
 
-    // Handle non-JSON responses from OpenRouter
+    // Handle non-JSON responses from Gemini
     const contentType = response.headers.get("content-type");
     if (!contentType || !contentType.includes("application/json")) {
       const textResponse = await response.text();
-      console.error("OpenRouter non-JSON response:", textResponse);
+      console.error("Gemini non-JSON response:", textResponse);
       return NextResponse.json(
-        { error: "OpenRouter API returned non-JSON response: " + textResponse.substring(0, 100) },
+        { error: "Gemini API returned non-JSON response: " + textResponse.substring(0, 100) },
         { status: 500 }
       );
     }
@@ -138,30 +135,30 @@ export async function POST(request: NextRequest) {
     } catch (jsonError) {
       console.error("JSON parsing error:", jsonError);
       return NextResponse.json(
-        { error: "Failed to parse OpenRouter API response" },
+        { error: "Failed to parse Gemini API response" },
         { status: 500 }
       );
     }
 
     if (!response.ok) {
-      console.error("OpenRouter API error:", JSON.stringify(data));
+      console.error("Gemini API error:", JSON.stringify(data));
       return NextResponse.json(
-        { error: "Failed to process with OpenRouter API: " + (data.error?.message || data.message || "Unknown error") },
+        { error: "Failed to process with Gemini API: " + (data.error?.message || data.message || "Unknown error") },
         { status: 500 }
       );
     }
 
-    // Validate the response structure
-    if (!data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.content) {
-      console.error("Invalid OpenRouter API response structure:", JSON.stringify(data));
+    // Validate the response structure and extract the content
+    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0].text) {
+      console.error("Invalid Gemini API response structure:", JSON.stringify(data));
       return NextResponse.json(
-        { error: "Invalid response structure from OpenRouter API" },
+        { error: "Invalid response structure from Gemini API" },
         { status: 500 }
       );
     }
     
     // Process the response to ensure clean formatting
-    let formattedOutput = data.choices[0].message.content;
+    let formattedOutput = data.candidates[0].content.parts[0].text;
     
     // Remove any potential markdown code block markers that might be included
     formattedOutput = formattedOutput.replace(/```[a-z]*\n/g, '').replace(/```/g, '');

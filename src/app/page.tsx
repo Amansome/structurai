@@ -80,7 +80,7 @@ export default function HomePage() {
             isLoaded ? "opacity-100" : "opacity-0"
           }`}
         >
-          Powered by DeepSeek R1 Distill Llama 70B
+          Powered by Google Gemini 1.5 Pro
         </p>
       </div>
       

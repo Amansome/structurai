@@ -49,7 +49,7 @@ Format the output in a clean, readable way with proper headings and bullet point
 };
 
 // Get API key from environment variables
-const API_KEY = process.env.DEEPSEEK_API_KEY;
+const API_KEY = process.env.GEMINI_API_KEY;
 
 export async function POST(request: NextRequest) {
   try {
@@ -76,45 +76,55 @@ export async function POST(request: NextRequest) {
     const systemPrompt = "You are an expert app development planner that helps users structure their ideas into comprehensive development plans.";
     const userPrompt = `${templatePrompt}\n\nHere's the idea:\n${input}`;
 
-    // Call the OpenRouter API with DeepSeek model
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    // Call the Gemini API
+    const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${API_KEY}`;
+    
+    const response = await fetch(geminiEndpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${API_KEY}`,
-        "HTTP-Referer": "https://brain-dumper.vercel.app",
-        "X-Title": "Brain Dumper"
       },
       body: JSON.stringify({
-        model: "deepseek/deepseek-r1-distill-llama-70b:free",
-        messages: [
-          {
-            role: "system",
-            content: systemPrompt
-          },
+        contents: [
           {
             role: "user",
-            content: userPrompt
+            parts: [
+              {
+                text: `${systemPrompt}\n\n${userPrompt}`
+              }
+            ]
           }
         ],
-        temperature: 0.7,
-        max_tokens: 2000,
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 2000,
+          topP: 0.9,
+        },
       }),
     });
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("OpenRouter API error:", errorData);
+      console.error("Gemini API error:", errorData);
       return NextResponse.json(
-        { error: "Failed to process with OpenRouter API: " + (errorData.error?.message || "Unknown error") },
+        { error: "Failed to process with Gemini API: " + (errorData.error?.message || "Unknown error") },
         { status: 500 }
       );
     }
 
     const data = await response.json();
     
+    // Validate the response structure and extract the content
+    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0].text) {
+      console.error("Invalid Gemini API response structure:", JSON.stringify(data));
+      return NextResponse.json(
+        { error: "Invalid response structure from Gemini API" },
+        { status: 500 }
+      );
+    }
+    
     return NextResponse.json({
-      output: data.choices[0].message.content,
+      output: data.candidates[0].content.parts[0].text,
     });
   } catch (error) {
     console.error("Error processing idea:", error);
