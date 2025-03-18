@@ -2,48 +2,58 @@ import { NextRequest, NextResponse } from "next/server";
 
 // Template prompts for different output formats
 const templates = {
-  default: `You are an expert app development planner. Convert the following unstructured idea into a well-structured app development plan. Include:
+  default: `You are an expert AI app development planner. Convert the following unstructured idea into a well-structured AI app development plan. Include:
 1. Project Overview
-2. Core Features (with detailed descriptions)
-3. Technical Requirements
-4. Development Roadmap
-5. Potential Challenges
+2. Core AI Features (with detailed descriptions of AI/ML capabilities)
+3. Technical Architecture (focusing on AI components, models, and APIs)
+4. Development Approach (focus on implementation strategy, NOT timeline estimates)
+5. Technical Challenges and Solutions
+
+IMPORTANT: Do NOT include any timeline estimates, phases with weeks/days, or calendars. Focus on the technical implementation approach rather than scheduling.
 
 Format the output in a clean, copy-paste friendly format with proper headings, bullet points, and consistent spacing. Do not include any special characters or formatting that wouldn't transfer well when copied to other software. Use plain text formatting with clear section headers, numbered lists, and bullet points using standard characters (*, -, 1., etc.).`,
 
-  cursor: `You are an expert app development planner for Cursor IDE. Convert the following unstructured idea into a well-structured app development plan specifically for Cursor. Include:
+  cursor: `You are an expert AI app development planner for Cursor IDE. Convert the following unstructured idea into a well-structured AI app development plan specifically for Cursor. Include:
 1. Project Overview
-2. Core Features (with detailed descriptions)
-3. Technical Stack (focus on technologies that work well with Cursor)
-4. Development Roadmap
-5. Cursor-specific Implementation Tips
+2. Core AI Features (with detailed descriptions)
+3. Technical Stack (focus on AI/ML technologies that work well with Cursor)
+4. Development Approach (focus on implementation strategy, NOT timeline estimates)
+5. Cursor-specific AI Implementation Tips
+
+IMPORTANT: Do NOT include any timeline estimates, phases with weeks/days, or calendars. Focus on the technical implementation approach rather than scheduling.
 
 Format the output in a clean, copy-paste friendly format with proper headings, bullet points, and consistent spacing. Do not include any special characters or formatting that wouldn't transfer well when copied to other software. Use plain text formatting with clear section headers, numbered lists, and bullet points using standard characters (*, -, 1., etc.).`,
 
-  windsurf: `You are an expert app development planner for Windsurf. Convert the following unstructured idea into a well-structured app development plan specifically for Windsurf. Include:
+  windsurf: `You are an expert AI app development planner for Windsurf. Convert the following unstructured idea into a well-structured AI app development plan specifically for Windsurf. Include:
 1. Project Overview
-2. Core Features (with detailed descriptions)
-3. Technical Stack (focus on technologies that work well with Windsurf)
-4. Development Roadmap
-5. Windsurf-specific Implementation Tips
+2. Core AI Features (with detailed descriptions)
+3. Technical Stack (focus on AI/ML technologies that work well with Windsurf)
+4. Development Approach (focus on implementation strategy, NOT timeline estimates)
+5. Windsurf-specific AI Implementation Tips
+
+IMPORTANT: Do NOT include any timeline estimates, phases with weeks/days, or calendars. Focus on the technical implementation approach rather than scheduling.
 
 Format the output in a clean, copy-paste friendly format with proper headings, bullet points, and consistent spacing. Do not include any special characters or formatting that wouldn't transfer well when copied to other software. Use plain text formatting with clear section headers, numbered lists, and bullet points using standard characters (*, -, 1., etc.).`,
 
-  lovable: `You are an expert app development planner focused on creating lovable products. Convert the following unstructured idea into a well-structured app development plan that prioritizes user delight. Include:
+  lovable: `You are an expert AI app development planner focused on creating lovable AI products. Convert the following unstructured idea into a well-structured AI app development plan that prioritizes user delight. Include:
 1. Project Overview
-2. Core Features (with detailed descriptions of how they create user delight)
-3. User Experience Considerations
-4. Development Roadmap (prioritizing features that create immediate value)
-5. Metrics for Measuring User Love
+2. Core AI Features (with detailed descriptions of how they create user delight)
+3. User Experience Considerations for AI Interactions
+4. Development Approach (prioritizing features that create immediate value, NOT timeline estimates)
+5. Metrics for Measuring AI Feature Success
+
+IMPORTANT: Do NOT include any timeline estimates, phases with weeks/days, or calendars. Focus on the technical implementation approach rather than scheduling.
 
 Format the output in a clean, copy-paste friendly format with proper headings, bullet points, and consistent spacing. Do not include any special characters or formatting that wouldn't transfer well when copied to other software. Use plain text formatting with clear section headers, numbered lists, and bullet points using standard characters (*, -, 1., etc.).`,
 
-  tempo: `You are an expert app development planner focused on rapid development. Convert the following unstructured idea into a well-structured app development plan optimized for speed and efficiency. Include:
+  tempo: `You are an expert AI app development planner focused on rapid AI development. Convert the following unstructured idea into a well-structured app development plan optimized for speed and efficiency. Include:
 1. Project Overview
-2. MVP Features (only the essential ones)
-3. Technical Stack (focus on technologies that enable rapid development)
-4. Accelerated Development Roadmap
-5. Shortcuts and Time-saving Strategies
+2. MVP AI Features (only the essential ones)
+3. Technical Stack (focus on AI/ML technologies that enable rapid development)
+4. Prioritized Development Approach (in order of implementation, NOT timeline estimates)
+5. Technical Shortcuts and Efficiency Strategies
+
+IMPORTANT: Do NOT include any timeline estimates, phases with weeks/days, or calendars. Focus on the technical implementation priority rather than scheduling.
 
 Format the output in a clean, copy-paste friendly format with proper headings, bullet points, and consistent spacing. Do not include any special characters or formatting that wouldn't transfer well when copied to other software. Use plain text formatting with clear section headers, numbered lists, and bullet points using standard characters (*, -, 1., etc.).`,
 };
@@ -94,8 +104,8 @@ export async function POST(request: NextRequest) {
     const templatePrompt = templates[template as keyof typeof templates] || templates.default;
     
     // Construct the prompt
-    const systemPrompt = "You are an expert app development planner that helps users structure their ideas into comprehensive development plans. Your output should be formatted in a way that can be directly copied and pasted into other software without formatting issues.";
-    const userPrompt = `${templatePrompt}\n\nHere's the idea:\n${input}\n\nIMPORTANT: Format your response as plain text with clear headings, consistent spacing, and standard bullet points/numbering that will copy-paste cleanly into any software. Avoid any special characters or formatting that might not transfer well.`;
+    const systemPrompt = "You are an expert AI app development planner that helps users structure their ideas into comprehensive technical plans for AI applications. Your output should be formatted in a way that can be directly copied and pasted into other software without formatting issues. IMPORTANT: Never include timeline estimates, phases with week/day durations, or scheduling information. Focus entirely on technical implementation approaches and architecture.";
+    const userPrompt = `${templatePrompt}\n\nHere's the idea:\n${input}\n\nIMPORTANT: Format your response as plain text with clear headings, consistent spacing, and standard bullet points/numbering that will copy-paste cleanly into any software. Avoid any special characters or formatting that might not transfer well. NEVER include any timeline estimates or numbered phases with durations.`;
 
     // Call the Gemini API
     let response;

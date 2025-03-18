@@ -164,7 +164,7 @@ export default function BrainDumperPage() {
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-3xl font-bold mb-6 text-center">Brain Dumper</h1>
       <p className="text-center mb-8 text-muted-foreground">
-        Transform your unstructured ideas into structured app development plans
+        Transform your unstructured ideas into structured AI app development plans
       </p>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -173,13 +173,13 @@ export default function BrainDumperPage() {
           <CardHeader>
             <CardTitle>Your Idea</CardTitle>
             <CardDescription>
-              Dump your unstructured ideas here. The more details, the better the output.
+              Dump your unstructured ideas here. Focus on the AI capabilities and technical requirements for better results.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <textarea
               className="w-full h-64 p-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your app idea, feature list, or any unstructured thoughts..."
+              placeholder="Enter your AI app idea, feature list, or any unstructured thoughts about your AI application..."
               value={userInput}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setUserInput(e.target.value)}
               disabled={isProcessing}
@@ -218,9 +218,9 @@ export default function BrainDumperPage() {
         {/* Output Section */}
         <Card className="shadow-lg">
           <CardHeader>
-            <CardTitle>Structured Plan</CardTitle>
+            <CardTitle>Structured AI Plan</CardTitle>
             <CardDescription>
-              Your idea transformed into a structured development plan
+              Your idea transformed into a structured AI development plan
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -287,20 +287,20 @@ export default function BrainDumperPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div 
               className="p-4 border rounded-md cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-              onClick={() => !isProcessing && setUserInput("I want to build a task management app with features like task creation, due dates, priority levels, and team collaboration.")}
+              onClick={() => !isProcessing && setUserInput("I want to build an AI task management app that uses machine learning to prioritize tasks, predict completion times, and automatically categorize new tasks based on historical patterns.")}
             >
-              <h3 className="font-medium mb-2">Task Management App</h3>
+              <h3 className="font-medium mb-2">AI Task Management App</h3>
               <p className="text-sm text-muted-foreground">
-                I want to build a task management app with features like task creation, due dates, priority levels, and team collaboration.
+                I want to build an AI task management app that uses machine learning to prioritize tasks, predict completion times, and automatically categorize new tasks based on historical patterns.
               </p>
             </div>
             <div 
               className="p-4 border rounded-md cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-              onClick={() => !isProcessing && setUserInput("I need a recipe app that lets users save recipes, create shopping lists, plan meals for the week, and discover new recipes based on ingredients they have.")}
+              onClick={() => !isProcessing && setUserInput("I need an AI-powered recipe app that analyzes ingredients in a photo, recommends recipe substitutions based on nutrition and taste profiles, and adapts cooking instructions based on user skill level and available kitchen equipment.")}
             >
-              <h3 className="font-medium mb-2">Recipe App</h3>
+              <h3 className="font-medium mb-2">AI Recipe Assistant</h3>
               <p className="text-sm text-muted-foreground">
-                I need a recipe app that lets users save recipes, create shopping lists, plan meals for the week, and discover new recipes based on ingredients they have.
+                I need an AI-powered recipe app that analyzes ingredients in a photo, recommends recipe substitutions based on nutrition and taste profiles, and adapts cooking instructions based on user skill level and available kitchen equipment.
               </p>
             </div>
           </div>

@@ -251,7 +251,7 @@ export default function StructurAIPage() {
             isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
           }`}
         >
-          Transform your unstructured ideas into structured app development plans
+          Transform your unstructured ideas into structured AI app development plans
         </p>
 
         <div 
@@ -264,13 +264,13 @@ export default function StructurAIPage() {
             <CardHeader>
               <CardTitle className="text-blue-600 dark:text-blue-400">Your Idea</CardTitle>
               <CardDescription>
-                Share your unstructured ideas here. The more details, the better the output.
+                Share your unstructured ideas here. Focus on the AI capabilities and technical requirements for better results.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <textarea
                 className="w-full h-64 p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm"
-                placeholder="Enter your app idea, feature list, or any unstructured thoughts..."
+                placeholder="Enter your AI app idea, feature list, or any unstructured thoughts about your AI application..."
                 value={userInput}
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setUserInput(e.target.value)}
                 disabled={isProcessing}
@@ -322,9 +322,9 @@ export default function StructurAIPage() {
           {/* Output Section */}
           <Card className="shadow-xl border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm transition-all duration-300 hover:shadow-2xl">
             <CardHeader>
-              <CardTitle className="text-blue-600 dark:text-blue-400">Structured Plan</CardTitle>
+              <CardTitle className="text-blue-600 dark:text-blue-400">Structured AI Plan</CardTitle>
               <CardDescription>
-                Your idea transformed into a structured development plan
+                Your idea transformed into a structured AI development plan
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -437,20 +437,20 @@ export default function StructurAIPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div 
                 className="p-4 border rounded-lg cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-700 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-md"
-                onClick={() => !isProcessing && setUserInput("I want to build a task management app with features like task creation, due dates, priority levels, and team collaboration.")}
+                onClick={() => !isProcessing && setUserInput("I want to build an AI task management app that uses machine learning to prioritize tasks, predict completion times, and automatically categorize new tasks based on historical patterns.")}
               >
-                <h3 className="font-medium mb-2 text-blue-600 dark:text-blue-400">Task Management App</h3>
+                <h3 className="font-medium mb-2 text-blue-600 dark:text-blue-400">AI Task Management App</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  I want to build a task management app with features like task creation, due dates, priority levels, and team collaboration.
+                  I want to build an AI task management app that uses machine learning to prioritize tasks, predict completion times, and automatically categorize new tasks based on historical patterns.
                 </p>
               </div>
               <div 
                 className="p-4 border rounded-lg cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-700 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-md"
-                onClick={() => !isProcessing && setUserInput("I need a recipe app that lets users save recipes, create shopping lists, plan meals for the week, and discover new recipes based on ingredients they have.")}
+                onClick={() => !isProcessing && setUserInput("I need an AI-powered recipe app that analyzes ingredients in a photo, recommends recipe substitutions based on nutrition and taste profiles, and adapts cooking instructions based on user skill level and available kitchen equipment.")}
               >
-                <h3 className="font-medium mb-2 text-blue-600 dark:text-blue-400">Recipe App</h3>
+                <h3 className="font-medium mb-2 text-blue-600 dark:text-blue-400">AI Recipe Assistant</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  I need a recipe app that lets users save recipes, create shopping lists, plan meals for the week, and discover new recipes based on ingredients they have.
+                  I need an AI-powered recipe app that analyzes ingredients in a photo, recommends recipe substitutions based on nutrition and taste profiles, and adapts cooking instructions based on user skill level and available kitchen equipment.
                 </p>
               </div>
             </div>
