@@ -51,6 +51,25 @@ Format the output in a clean, copy-paste friendly format with proper headings, b
 // Get API key from environment variables
 const API_KEY = process.env.GEMINI_API_KEY;
 
+// Set a longer timeout for the fetch request (2 minutes)
+const FETCH_TIMEOUT = 120000; // 2 minutes in milliseconds
+
+// Custom fetch with timeout
+const fetchWithTimeout = async (url: string, options: RequestInit, timeout: number) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+  
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    return response;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+};
+
 export async function POST(request: NextRequest) {
   try {
     const { input, template = "default" } = await request.json();
@@ -81,36 +100,55 @@ export async function POST(request: NextRequest) {
     // Call the Gemini API
     let response;
     try {
-      // Gemini API endpoint
+      // Gemini API endpoint with API key as query parameter
       const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${API_KEY}`;
       
-      response = await fetch(geminiEndpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      // Prepare request body
+      const requestBody = {
+        contents: [
+          {
+            role: "user",
+            parts: [
+              {
+                text: `${systemPrompt}\n\n${userPrompt}`
+              }
+            ]
+          }
+        ],
+        generationConfig: {
+          temperature: 0.5,
+          maxOutputTokens: 2000, // Reduced from 2500 to prevent timeouts
+          topP: 0.9,
         },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: [
-                {
-                  text: `${systemPrompt}\n\n${userPrompt}`
-                }
-              ]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.5,
-            maxOutputTokens: 2500,
-            topP: 0.9,
+      };
+      
+      console.log("Sending request to Gemini API...");
+      
+      // Use the custom fetch with timeout
+      response = await fetchWithTimeout(
+        geminiEndpoint, 
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        }),
-      });
+          body: JSON.stringify(requestBody),
+        },
+        FETCH_TIMEOUT
+      );
       
       console.log("Gemini API response status:", response.status);
-    } catch (fetchError) {
+    } catch (fetchError: any) {
       console.error("Fetch error:", fetchError);
+      
+      // Check if the error is a timeout
+      if (fetchError.name === 'AbortError') {
+        return NextResponse.json(
+          { error: "Request to Gemini API timed out. Please try again with a shorter input or try later." },
+          { status: 504 }
+        );
+      }
+      
       return NextResponse.json(
         { error: "Failed to connect to Gemini API: " + (fetchError instanceof Error ? fetchError.message : "Network error") },
         { status: 500 }

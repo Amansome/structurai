@@ -38,7 +38,13 @@ export default function BrainDumperPage() {
     setOutputPlan("");
     
     try {
-      const response = await fetch("/api/brain-dumper/process", {
+      // Set up a timeout for the overall request (3 minutes)
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error("Request timed out. Please try with a shorter input or try again later.")), 180000);
+      });
+
+      // Regular fetch request
+      const fetchPromise = fetch("/api/brain-dumper/process", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -49,13 +55,27 @@ export default function BrainDumperPage() {
         }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to process idea");
-      }
+      // Race between the fetch and the timeout
+      const response = await Promise.race([fetchPromise, timeoutPromise]) as Response;
 
       setProcessingStatus("Processing your idea...");
+      
+      // Handle non-JSON responses
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const textResponse = await response.text();
+        throw new Error(`Server returned non-JSON response: ${textResponse.substring(0, 100)}...`);
+      }
+
       const data = await response.json();
+      
+      if (!response.ok) {
+        // Check for timeout status code (504)
+        if (response.status === 504) {
+          throw new Error("Processing timed out. Please try with a shorter input or try again later.");
+        }
+        throw new Error(data.error || `API error: ${response.status} ${response.statusText}`);
+      }
       
       if (!data.output) {
         throw new Error("No output received from API");
@@ -66,14 +86,23 @@ export default function BrainDumperPage() {
         title: "Success!",
         description: "Your idea has been processed successfully.",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error processing idea:", error);
+      
+      // Determine if it's a timeout error
+      const isTimeoutError = error.message.includes("timed out") || error.message.includes("timeout");
+      
       toast({
-        title: "Processing Error",
+        title: isTimeoutError ? "Processing Timeout" : "Processing Error",
         description: error.message || "There was an error processing your idea. Please try again.",
         variant: "destructive",
       });
-      setOutputPlan("Error: " + (error.message || "Failed to process your idea. Please try again."));
+      
+      if (isTimeoutError) {
+        setOutputPlan("Error: Processing timed out. Your idea might be too complex or the service is experiencing high load. Please try the following:\n\n1. Shorten your input text\n2. Simplify your idea description\n3. Try again later when the service might be less busy");
+      } else {
+        setOutputPlan("Error: " + (error.message || "Failed to process your idea. Please try again."));
+      }
     } finally {
       setIsProcessing(false);
       setProcessingStatus("");
