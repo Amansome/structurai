@@ -164,7 +164,7 @@ export default function BrainDumperPage() {
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-3xl font-bold mb-6 text-center">Brain Dumper</h1>
       <p className="text-center mb-8 text-muted-foreground">
-        Transform your unstructured ideas into structured AI app development plans
+        Transform your unstructured ideas into structured AI app development plans ready for coding
       </p>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -173,7 +173,7 @@ export default function BrainDumperPage() {
           <CardHeader>
             <CardTitle>Your Idea</CardTitle>
             <CardDescription>
-              Dump your unstructured ideas here. Focus on the AI capabilities and technical requirements for better results.
+              Dump your unstructured ideas here. Focus on the AI capabilities and technical requirements you want implemented.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -218,9 +218,9 @@ export default function BrainDumperPage() {
         {/* Output Section */}
         <Card className="shadow-lg">
           <CardHeader>
-            <CardTitle>Structured AI Plan</CardTitle>
+            <CardTitle>Structured AI Development Plan</CardTitle>
             <CardDescription>
-              Your idea transformed into a structured AI development plan
+              Your idea transformed into a structured technical plan ready to use in Cursor, Windsurf, or other coding tools
             </CardDescription>
           </CardHeader>
           <CardContent>

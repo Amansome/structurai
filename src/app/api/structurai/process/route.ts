@@ -2,58 +2,78 @@ import { NextRequest, NextResponse } from "next/server";
 
 // Template prompts for different output formats
 const templates = {
-  default: `You are an expert AI app development planner. Convert the following unstructured idea into a well-structured AI app development plan. Include:
-1. Project Overview
-2. Core AI Features (with detailed descriptions of AI/ML capabilities)
-3. Technical Architecture (focusing on AI components, models, and APIs)
-4. Development Approach (focus on implementation strategy, NOT timeline estimates)
-5. Technical Challenges and Solutions
+  default: `You are an expert AI app development planner. Convert the following unstructured idea into a well-structured AI app development plan that can be directly fed into coding tools. Include:
+1. Project Overview (brief, technical)
+2. Core AI Features (with implementation details and code structure)
+3. Technical Architecture (with specific file structure, components, and code organization)
+4. Implementation Approach (focusing on coding patterns and implementation details)
+5. Code Samples (include key snippets, APIs, or functions that would be central to implementation)
 
-IMPORTANT: Do NOT include any timeline estimates, phases with weeks/days, or calendars. Focus on the technical implementation approach rather than scheduling.
-
-Format the output in a clean, copy-paste friendly format with proper headings, bullet points, and consistent spacing. Do not include any special characters or formatting that wouldn't transfer well when copied to other software. Use plain text formatting with clear section headers, numbered lists, and bullet points using standard characters (*, -, 1., etc.).`,
-
-  cursor: `You are an expert AI app development planner for Cursor IDE. Convert the following unstructured idea into a well-structured AI app development plan specifically for Cursor. Include:
-1. Project Overview
-2. Core AI Features (with detailed descriptions)
-3. Technical Stack (focus on AI/ML technologies that work well with Cursor)
-4. Development Approach (focus on implementation strategy, NOT timeline estimates)
-5. Cursor-specific AI Implementation Tips
-
-IMPORTANT: Do NOT include any timeline estimates, phases with weeks/days, or calendars. Focus on the technical implementation approach rather than scheduling.
+IMPORTANT: 
+- Do NOT include any timeline estimates, phases with weeks/days, or calendars.
+- Focus on technical details and code patterns that can be used directly in development.
+- Structure your response as if it's a technical spec for a developer to immediately start coding.
+- Keep your output clean and structured for direct copy-paste into coding tools.
 
 Format the output in a clean, copy-paste friendly format with proper headings, bullet points, and consistent spacing. Do not include any special characters or formatting that wouldn't transfer well when copied to other software. Use plain text formatting with clear section headers, numbered lists, and bullet points using standard characters (*, -, 1., etc.).`,
 
-  windsurf: `You are an expert AI app development planner for Windsurf. Convert the following unstructured idea into a well-structured AI app development plan specifically for Windsurf. Include:
-1. Project Overview
-2. Core AI Features (with detailed descriptions)
-3. Technical Stack (focus on AI/ML technologies that work well with Windsurf)
-4. Development Approach (focus on implementation strategy, NOT timeline estimates)
-5. Windsurf-specific AI Implementation Tips
+  cursor: `You are an expert AI app development planner for Cursor IDE. Convert the following unstructured idea into a well-structured AI app development plan that can be directly used in Cursor. Include:
+1. Project Structure (file organization and directory setup)
+2. Core Components (with implementation details for AI features)
+3. Technical Stack (focus on specific AI/ML technologies with code examples)
+4. Implementation Guide (step-by-step coding approach with specific functions and API details)
+5. Cursor-specific Features (code snippets that take advantage of Cursor's capabilities)
 
-IMPORTANT: Do NOT include any timeline estimates, phases with weeks/days, or calendars. Focus on the technical implementation approach rather than scheduling.
-
-Format the output in a clean, copy-paste friendly format with proper headings, bullet points, and consistent spacing. Do not include any special characters or formatting that wouldn't transfer well when copied to other software. Use plain text formatting with clear section headers, numbered lists, and bullet points using standard characters (*, -, 1., etc.).`,
-
-  lovable: `You are an expert AI app development planner focused on creating lovable AI products. Convert the following unstructured idea into a well-structured AI app development plan that prioritizes user delight. Include:
-1. Project Overview
-2. Core AI Features (with detailed descriptions of how they create user delight)
-3. User Experience Considerations for AI Interactions
-4. Development Approach (prioritizing features that create immediate value, NOT timeline estimates)
-5. Metrics for Measuring AI Feature Success
-
-IMPORTANT: Do NOT include any timeline estimates, phases with weeks/days, or calendars. Focus on the technical implementation approach rather than scheduling.
+IMPORTANT: 
+- Do NOT include any timeline estimates, phases with weeks/days, or calendars.
+- Focus on technical details that Cursor can help implement, including specific code patterns.
+- Structure your response to be immediately usable as a coding guide in Cursor.
+- Include specific code organization that works well with Cursor's AI assistance.
 
 Format the output in a clean, copy-paste friendly format with proper headings, bullet points, and consistent spacing. Do not include any special characters or formatting that wouldn't transfer well when copied to other software. Use plain text formatting with clear section headers, numbered lists, and bullet points using standard characters (*, -, 1., etc.).`,
 
-  tempo: `You are an expert AI app development planner focused on rapid AI development. Convert the following unstructured idea into a well-structured app development plan optimized for speed and efficiency. Include:
-1. Project Overview
-2. MVP AI Features (only the essential ones)
-3. Technical Stack (focus on AI/ML technologies that enable rapid development)
-4. Prioritized Development Approach (in order of implementation, NOT timeline estimates)
-5. Technical Shortcuts and Efficiency Strategies
+  windsurf: `You are an expert AI app development planner for Windsurf. Convert the following unstructured idea into a well-structured AI app development plan that can be directly implemented in Windsurf. Include:
+1. Project Structure (file organization and directory setup)
+2. Core Components (with implementation details for AI features)
+3. Technical Stack (focus on specific AI/ML technologies with code examples)
+4. Implementation Guide (step-by-step coding approach with specific functions and API details)
+5. Windsurf-specific Patterns (code snippets that take advantage of Windsurf's capabilities)
 
-IMPORTANT: Do NOT include any timeline estimates, phases with weeks/days, or calendars. Focus on the technical implementation priority rather than scheduling.
+IMPORTANT: 
+- Do NOT include any timeline estimates, phases with weeks/days, or calendars.
+- Focus on technical details that Windsurf can help implement, including specific code patterns.
+- Structure your response to be immediately usable as a coding guide in Windsurf.
+- Include specific code organization that works well with Windsurf's AI assistance.
+
+Format the output in a clean, copy-paste friendly format with proper headings, bullet points, and consistent spacing. Do not include any special characters or formatting that wouldn't transfer well when copied to other software. Use plain text formatting with clear section headers, numbered lists, and bullet points using standard characters (*, -, 1., etc.).`,
+
+  lovable: `You are an expert AI app development planner focused on creating lovable AI products. Convert the following unstructured idea into a well-structured AI app development plan that prioritizes user delight and can be implemented directly. Include:
+1. Project Structure (file organization focusing on user experience)
+2. Core AI Components (with implementation details and user-facing features)
+3. User Experience Architecture (frontend components, UI patterns, interaction flows)
+4. Implementation Guide (with focus on code that delivers delightful experiences)
+5. Testing Approach (code structure for evaluating user satisfaction and AI effectiveness)
+
+IMPORTANT: 
+- Do NOT include any timeline estimates, phases with weeks/days, or calendars.
+- Focus on technical details that deliver user delight, including specific code patterns.
+- Structure your response to be immediately usable as a coding guide.
+- Include specific code examples for the most important user-facing features.
+
+Format the output in a clean, copy-paste friendly format with proper headings, bullet points, and consistent spacing. Do not include any special characters or formatting that wouldn't transfer well when copied to other software. Use plain text formatting with clear section headers, numbered lists, and bullet points using standard characters (*, -, 1., etc.).`,
+
+  tempo: `You are an expert AI app development planner focused on rapid AI development. Convert the following unstructured idea into a well-structured app development plan optimized for speed and efficiency that can be implemented immediately. Include:
+1. MVP Project Structure (minimal viable file organization)
+2. Essential Components (with implementation details only for critical AI features)
+3. Technical Stack (focus on rapid development tools with code examples)
+4. Fast Implementation Guide (streamlined coding approach with specific functions)
+5. Technical Shortcuts (code patterns and reusable components to accelerate development)
+
+IMPORTANT: 
+- Do NOT include any timeline estimates, phases with weeks/days, or calendars.
+- Focus on technical implementation that can be built quickly, including specific code patterns.
+- Structure your response to be immediately usable as a coding guide.
+- Include specific code examples for the most critical features only.
 
 Format the output in a clean, copy-paste friendly format with proper headings, bullet points, and consistent spacing. Do not include any special characters or formatting that wouldn't transfer well when copied to other software. Use plain text formatting with clear section headers, numbered lists, and bullet points using standard characters (*, -, 1., etc.).`,
 };
@@ -104,8 +124,8 @@ export async function POST(request: NextRequest) {
     const templatePrompt = templates[template as keyof typeof templates] || templates.default;
     
     // Construct the prompt
-    const systemPrompt = "You are an expert AI app development planner that helps users structure their ideas into comprehensive technical plans for AI applications. Your output should be formatted in a way that can be directly copied and pasted into other software without formatting issues. IMPORTANT: Never include timeline estimates, phases with week/day durations, or scheduling information. Focus entirely on technical implementation approaches and architecture.";
-    const userPrompt = `${templatePrompt}\n\nHere's the idea:\n${input}\n\nIMPORTANT: Format your response as plain text with clear headings, consistent spacing, and standard bullet points/numbering that will copy-paste cleanly into any software. Avoid any special characters or formatting that might not transfer well. NEVER include any timeline estimates or numbered phases with durations.`;
+    const systemPrompt = "You are an expert AI app development planner that helps users structure their ideas into comprehensive technical plans for AI applications. Your output should be formatted for direct use in coding tools like Cursor, Windsurf, or Tempo. IMPORTANT: Never include timeline estimates, phases with week/day durations, or scheduling information. Focus entirely on technical implementation approaches, code organization, file structure, and specific code patterns.";
+    const userPrompt = `${templatePrompt}\n\nHere's the idea:\n${input}\n\nIMPORTANT: Format your response as plain text with clear headings, consistent spacing, and standard bullet points/numbering that will copy-paste cleanly into coding tools. Include code examples where appropriate. NEVER include any timeline estimates or numbered phases with durations. The response should be IMMEDIATELY USABLE by AI coding tools like Cursor without further editing.`;
 
     // Call the Gemini API
     let response;

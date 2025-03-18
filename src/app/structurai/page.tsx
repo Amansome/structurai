@@ -251,7 +251,7 @@ export default function StructurAIPage() {
             isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
           }`}
         >
-          Transform your unstructured ideas into structured AI app development plans
+          Transform your unstructured ideas into structured AI app development plans ready for coding
         </p>
 
         <div 
@@ -264,7 +264,7 @@ export default function StructurAIPage() {
             <CardHeader>
               <CardTitle className="text-blue-600 dark:text-blue-400">Your Idea</CardTitle>
               <CardDescription>
-                Share your unstructured ideas here. Focus on the AI capabilities and technical requirements for better results.
+                Share your unstructured ideas here. Focus on the AI capabilities and technical requirements you want implemented.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -322,9 +322,9 @@ export default function StructurAIPage() {
           {/* Output Section */}
           <Card className="shadow-xl border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm transition-all duration-300 hover:shadow-2xl">
             <CardHeader>
-              <CardTitle className="text-blue-600 dark:text-blue-400">Structured AI Plan</CardTitle>
+              <CardTitle className="text-blue-600 dark:text-blue-400">Structured AI Development Plan</CardTitle>
               <CardDescription>
-                Your idea transformed into a structured AI development plan
+                Your idea transformed into a structured technical plan ready to use in Cursor, Windsurf, or other coding tools
               </CardDescription>
             </CardHeader>
             <CardContent>
